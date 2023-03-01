@@ -1,16 +1,20 @@
 package com.example.cucumber;
 
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 
 public class LoginSteps {
     public WebDriver driver;
@@ -58,5 +62,26 @@ public class LoginSteps {
     public void type(By selector, String text){
         driver.findElement(selector).click();
         driver.findElement(selector).sendKeys(text);
+    }
+
+    @When("enter invalid creds")
+    public void enterInvalidCreds(DataTable table) {
+        List<Map<String, String>> dataTable = table.asMaps();
+        String email = dataTable.get(0).get("email");
+        String password = dataTable.get(0).get("password");
+
+        type( By.cssSelector("#defaultRegisterFormEmail") , email);
+        type( By.cssSelector("#login-form > div:nth-child(2) > div.col-sm-5 > div > input") , password);
+    }
+
+    @Then("error message is shown")
+    public void errorMessageIsShown() {
+        Assert.assertTrue( isElementPresent(By.cssSelector("#error-message")) );
+    }
+
+    @When("we enter {word} and {word} as invalid data")
+    public void weEnterEmailAndPasswordAsInvalidData(String email, String password) {
+        type( By.cssSelector("#defaultRegisterFormEmail") , email);
+        type(By.cssSelector("#login-form > div:nth-child(2) > div.col-sm-5 > div > input") , password);
     }
 }
